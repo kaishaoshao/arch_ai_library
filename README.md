@@ -1,1 +1,38 @@
-学习文档
+learn_ptx
+
+## AI Infra 学习
+
+虽然学的很泛不太好，但是知识面扩充是有必要的。
+
+## ai
+
+* d2l :
+* makemore
+* micrograd
+* mini-mnist-c
+* SKNN
+* victorzhou
+
+## algorithm
+
+* Hacker's_Delight
+
+## cuda
+
+* 权双
+* basic_cuda
+* learn_ptx
+
+## cxx
+
+## DSL
+
+## dsp
+
+## riscv
+
+## rust
+
+## tilelang
+
+## triton
