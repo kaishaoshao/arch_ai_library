@@ -1,5 +1,3 @@
-learn_ptx
-
 ## AI Infra 学习
 
 虽然学的很泛不太好，但是知识面扩充是有必要的。
@@ -7,8 +5,8 @@ learn_ptx
 ## ai
 
 * d2l :
-* makemore
-* micrograd
+* makemore: https://github.com/karpathy/makemore.git
+* micrograd:https://github.com/karpathy/micrograd.git
 * mini-mnist-c
 * SKNN
 * victorzhou
