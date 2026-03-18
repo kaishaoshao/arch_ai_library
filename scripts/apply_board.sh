@@ -1,0 +1,1 @@
+python /home/shaokai/Desktop/code/system/test-system/scripts/board_farm_script/board_farm.py --config ~/.terapines/board_farm_user.cfg.json --elf-path $1
