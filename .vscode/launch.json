@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug Rvemu",
+      "program": "${workspaceFolder}/rust/src/Rvemu/target/debug/Rvemu",
+      "args": [
+        "${workspaceFolder}/rust/src/Rvemu/test/add-addi.bin"
+      ],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

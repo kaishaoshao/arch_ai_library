@@ -31,8 +31,13 @@ impl Cpu {
     self.buf.store(addr, size, value)
   }
 
+  ///Get an instruction form the dram
   pub fn fetch(&mut self) -> Result<u64, Exception> {
     self.bus.load(self.pc, 32)
+  }
+
+  pub fn execute(&mut self, inst: u64) -> Result<u64, Exception> {
+    
   }
 
 }
