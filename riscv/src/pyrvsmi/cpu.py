@@ -16,11 +16,15 @@ cpu = {
 def get_pc(cpu):
   return cpu['pc']
 
+def set_pc(cpu, value):
+  cpu['pc'] = value
+
+
 '''
 pc加4
 '''
 def pc_inc4(cpu):
-  cpu['pc'] += 4
+  set_pc(cpu, get_pc(cpu) + 4)
 
 '''
 取指令
@@ -43,3 +47,8 @@ def step(cpu, mem):
   #显示指令地址，指令的16进制和二进制编码
   log(f'{hex(cpu['pc']):<{10}}: {hex(inst):<{10}} --- {bin(inst):{36}}')
   execute(cpu, mem, inst)
+
+def run(cpu, mem, image_filem, image_base=0x8000_0000, start=0x8000_0000):
+  load_image(mem, image_file, image_base)
+  set_pc(cpu, start)
+

@@ -19,7 +19,7 @@ Load data form memory
 def mem_load(mem, addr, size):
   addr = addr - mem['base']
   # 从内存中读取指定大小的数据，并转换为整数返回
-  return int.from_byters(bytes(mem['mem'][addr:addr + size]), 'little')
+  return int.from_bytes(bytes(mem['mem'][addr:addr + size]), 'little')
 
 '''
 Store data to memory
@@ -46,7 +46,7 @@ def check_addr(mem, addr):
   else:
     return True
 
-def load_image(mem, file, base = mem_base ):
+def load_image(mem, file, base = mem['base']):
   f = open(file, 'rb')
   size = os.path.getsize(file)  # 文件大小
   buf = f.read(size)            # 读取文件内容到缓冲区
@@ -56,3 +56,17 @@ def load_image(mem, file, base = mem_base ):
   mem['base'] = base            # 设置内存起始地址
   mem['size'] = size            # 设置内存大小
 
+'''
+测试代码
+'''
+# mem['mem'] = [1,2,3,4,5,6,7,8]
+# print(hex(mem_load(mem, 4, 4)))
+# hex(mem_load(mem, 0, 4))
+# mem_store(mem, 0, 4, 0x01020304)
+# print(hex(mem_load(mem, 0, 4)))
+
+# riscv-none-elf-gcc -Ttest=0x80000000 -mno-relax -march=rv32i_zisr -nostdlib -ffreestanding
+# -o test test0.S
+# riscv-none-elf-objcopy -O binary test test.bin
+# riscv-none-elf-objdump -D test
+# load_image(mem, 'test.bin', 0x80000000)
