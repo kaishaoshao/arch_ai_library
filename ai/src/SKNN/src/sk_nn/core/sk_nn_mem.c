@@ -25,18 +25,18 @@ void mem_clear(sk_mem* mem) {
 
 }
 
-sk_mem_tmp mem_temp_begin(sk_mem* mem) {
+sk_tmp_mem mem_temp_begin(sk_mem* mem) {
 
 }
 
-void mem_temp_end(sk_mem_tmp temp) {
+void mem_temp_end(sk_tmp_mem temp) {
 
 }
 
-sk_mem_tmp mem_scratch_get(sk_mem* conflicts, sk_u32 num_conflicts) {
+sk_tmp_mem mem_scratch_get(sk_mem* conflicts, sk_u32 num_conflicts) {
 
 }
 
-void mem_scratch_release(sk_mem_temp scratch) {
+void mem_scratch_release(sk_tmp_mem scratch) {
 
 }

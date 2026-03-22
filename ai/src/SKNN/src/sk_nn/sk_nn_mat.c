@@ -1,6 +1,6 @@
 #include "sk_nn.h"
 
-sk_matrix* mat_create(sk_memory *arena, uint32_t rows, uint32_t clos) {
+sk_matrix* mat_create(sk_mem *arena, uint32_t rows, uint32_t cols) {
   sk_matrix *mat = PUSH_STRUCT(arena, sk_matrix);
 
   mat->rows = rows;
@@ -9,25 +9,25 @@ sk_matrix* mat_create(sk_memory *arena, uint32_t rows, uint32_t clos) {
   return mat;
 }
 
-sk_matrix* mat_load(sk_memory *arena, uint32_t rows, uint32_t cols, const char* filename) {
-	sk_matrix mat = mat_create(arena, rows, cols);;
+sk_matrix* mat_load(sk_mem *arena, uint32_t rows, uint32_t cols, const char* filename) {
+	sk_matrix* mat = mat_create(arena, rows, cols);;
 
-	FILE *file = fopen(filename, "rb");
+	// FILE *file = fopen(filename, "rb");
 
-	fseek(f, SEEK_END);
-	sk_u64 size = ftell(f);
-	fseek(f, SEEK_SET);
-	
-	size = MIN(size, sizeof(sk_f32) * rows * cols)
-	fread(mat->data, 1, size, f);
-	fclose(f);
+	// fseek(file, SEEK_END);
+	// sk_u64 size = ftell(f);
+	// fseek(file, SEEK_SET);
+
+  // size = MIN(size, sizeof(sk_f32) * rows * cols);
+  // fread(mat->data, 1, size, file);
+  // fclose(f);
 
 	return mat;
 }
 
 
 bool mat_copy(sk_matrix *dst, sk_matrix *src){
-  if (dsk->rows != src->rows || dsk->cols != src->cols)
+  if (dst->rows != src->rows || dst->cols != src->cols)
     return false;
   memcpy(dst->data, src->data, sizeof(sk_f32) * (uint64_t)dst->rows * dst->cols);
   return true;
@@ -35,7 +35,7 @@ bool mat_copy(sk_matrix *dst, sk_matrix *src){
 
 
 void mat_clear(sk_matrix *mat){
-  memset(mat->data, 0, sizeof(sk_f32) * (uint64_t)mat->rows * mat.cols);
+  memset(mat->data, 0, sizeof(sk_f32) * (uint64_t)mat->rows * mat->cols);
 }
 
 void mat_fill(sk_matrix *mat, float val){
@@ -52,7 +52,7 @@ void mat_scale(sk_matrix *mat, float scale) {
   }
 }
 
-void mat_sum(sk_matrix *mat) {
+sk_f32 mat_sum(sk_matrix *mat) {
   uint64_t size = (uint64_t)mat->rows * mat->cols;
   sk_f32 sum = 0.0f;
   for (uint64_t i = 0; i < size; i++)
@@ -111,7 +111,7 @@ static void _mat_mul_tn(sk_matrix *out, const sk_matrix *a,
                         const sk_matrix *b) {
   for (sk_u64 k = 0; k < a->rows; k++) {
     for (sk_u64 i = 0; i < out->rows; i++) {
-      for (sk_u64 j = 0; j < a=out->cols; j++) {
+      for (sk_u64 j = 0; j < out->cols; j++) {
         out->data[j + i * out->cols] =
             a->data[i + k * a->cols] * b->data[j + k * b->cols];
       }
@@ -131,11 +131,11 @@ static void _mat_mul_tt(sk_matrix *out, const sk_matrix *a,
   }
 }
 
-sk_b32 mat_mul(sk_matrix *out, const sk_matrix *a, const sk_matrix *b
-               sk_b8 zer_out, sk_b8 transpose_a, sk_b8 transpose_b)  {
+sk_b32 mat_mul(sk_matrix *out, const sk_matrix *a, const sk_matrix *b,
+               sk_b8 zero_out, sk_b8 transpose_a, sk_b8 transpose_b)  {
   sk_u32 a_rows = transpose_a ? a->cols : a->rows;
   sk_u32 a_cols = transpose_a ? a->rows : a->cols;
-  sk_u32 b_row s = transpose_b ? b->cols : b->rows;
+  sk_u32 b_row  = transpose_b ? b->cols : b->rows;
   sk_u32 b_cols = transpose_a ? b->rows : b->cols;
 
   if (a_cols != b_cols)
@@ -147,10 +147,10 @@ sk_b32 mat_mul(sk_matrix *out, const sk_matrix *a, const sk_matrix *b
   sk_u32 transpose = (transpose_a << 1) | transpose_b;
   switch (transpose)
   {
-    case 0b00: { _mat_mul_nn(out, a, b); } break;
-    case 0b00: { _mat_mul_nt(out, a, b); } break;
-    case 0b00: { _mat_mul_tn(out, a, b); } break;
-    case 0b00: { _mat_mul_tt(out, a, b); } break;
+    case 0: { _mat_mul_nn(out, a, b); } break;
+    case 1: { _mat_mul_nt(out, a, b); } break;
+    case 2: { _mat_mul_tn(out, a, b); } break;
+    case 3: { _mat_mul_tt(out, a, b); } break;
   default:
     break;
   }
@@ -178,7 +178,7 @@ sk_b32 mat_softmax(sk_matrix *out, const sk_matrix *in){
   sk_f32 sum = 0.0f;
   for (sk_u64 i = 0; i < size; i++)
   {
-    out->data[i] = expf(in->data[i])
+    out->data[i] = expf(in->data[i]);
     sum += out->data[i];
   }
 
@@ -191,9 +191,9 @@ sk_b32 mat_cross_entropy(sk_matrix *out, const sk_matrix *p,
                          const sk_matrix *q) {
   if(p->rows != q->rows || p->cols != q->cols)
 	  return false;
-	if(out->rows != p->rows || out->cols != p.cols)
+	if(out->rows != p->rows || out->cols != p->cols)
 		return false;
-	
+
 	sk_u64 size  = (sk_u64)out->rows * out->cols;
 	for (sk_u64 i = 0; i < size; i++)
 		out->data[i] = p->data[i] == 0.0f ? 0.0f : p->data[i] * -logf(q->data[i]);
@@ -213,40 +213,39 @@ sk_b32 mat_relu_add_grad(sk_matrix *out, const sk_matrix *in, const sk_matrix *g
 }
 
 sk_b32 mat_softmax_add_grad(sk_matrix *out, const sk_matrix *softmax_out) {
-	if(softmax_out->rows != out->rows || softmax_out->cols != out->cols)		
+	if(softmax_out->rows != out->rows || softmax_out->cols != out->cols)
 	  return false;
-	mem_temp scratch = mem_scratch_get(NULL, 0);
+	sk_tmp_mem scratch = mem_scratch_get(NULL, 0);
 
-	sk_u32 size = MAX(softmax_out->rows, softmax_out.cols);
-	sk_matrix* temp = mat_create(scratch.mem, size, size);
+	sk_u32 size = MAX(softmax_out->rows, softmax_out->cols);
+	sk_matrix* temp = mat_create(&scratch.mem, size, size);
 
 	for (sk_u32 i = 0; i < size; i++)
 	{
 		for (sk_u32 j = 0; j < size; j++)
-				temp->data[i + j * size] = 
-					softmax_out->data[i] * ((i == j) - softmax_out->data[i]); 
-		
+				temp->data[i + j * size] =
+					softmax_out->data[i] * ((i == j) - softmax_out->data[i]);
+
 	}
-	
-	mat_mul(out, temp, grad, 0, 0, 0);
-	mem_scrathch_release(scratch);
+
+	// mat_mul(out, temp, grad, 0, 0, 0);
+	// mem_scrathch_release(&scratch);
 
 }
 
 sk_b32 mat_cross_entropy_add_grad(sk_matrix *p_grad, sk_matrix *q_grad, const sk_matrix *p, const sk_matrix *q, const sk_matrix *grad) {
-	if(p->rows != q.rows || p->cols != q.cols)
+	if(p->rows != q->rows || p->cols != q->cols)
 	  return false;
-	
+
 		sk_u64 size = (sk_u64)p->rows * p->cols;
 
-		if(p_grad != NULL) {
+		if(p_grad->cols != NULL) {
 			if(p_grad->rows != p->rows || p_grad->cols != p->cols)
 				return false;
 			for (sk_u64 i = 0; i < size; i++)
-				p_grad->data[i] +- -logf(q->data[i] * grad.data[i])
-				
-		}
-		if(q_grad != NULL) {
+        p_grad->data[i] += -logf(q->data[i] * grad->data[i]);
+    }
+		if(q_grad->rows != NULL) {
 			if(q_grad->rows != q->rows || q_grad->cols != q->cols)
 				return false;
 			for (sk_u64 i = 0; i < size; i++)
