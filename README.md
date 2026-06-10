@@ -20,17 +20,3 @@
 * 权双
 * basic_cuda
 * learn_ptx
-
-## cxx
-
-## DSL
-
-## dsp
-
-## riscv
-
-## rust
-
-## tilelang
-
-## triton
